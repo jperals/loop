@@ -6,10 +6,18 @@
         <textarea id="code"></textarea>
         <input type="text" id="component-id">
         <button id="save-button">Save</button>
+        <template is="dom-if" if="{{ componentId }}">
+            <iframe src="/components/{{ componentId }}"></iframe>
+        </template>
     </template>
     <script>
         Polymer({
             is: 'looop-editor',
+            properties: {
+                componentId: {
+                    type: String
+                }
+            },
             listeners: {
                 'save-button.tap': 'save'
             },
@@ -33,6 +41,7 @@
                         '/api/component/',
                         opts)
                         .then(function (response) {
+                            that.componentId = componentId;
                             that.fire('files-saved', response);
                             console.log(response);
                         })
