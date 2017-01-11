@@ -1,0 +1,45 @@
+<script src="/node_modules/webcomponents.js/webcomponents-lite.min.js"></script>
+<link rel="import" href="/node_modules/@polymer/polymer/polymer.html">
+
+<dom-module id="looop-editor">
+    <template>
+        <textarea id="code"></textarea>
+        <input type="text" id="component-id">
+        <button id="save-button">Save</button>
+    </template>
+    <script>
+        Polymer({
+            is: 'looop-editor',
+            listeners: {
+                'save-button.tap': 'save'
+            },
+            save: function() {
+                console.log('save');
+                let content = this.$.code.value;
+                let componentId = this.$['component-id'].value;
+                let headers = new Headers();
+                headers.append('Content-Type', 'application/json');
+                let reqBody = {
+                    code: content,
+                    componentId: componentId
+                };
+                let opts = {
+                    headers: headers,
+                    method: "PUT",
+                    body: JSON.stringify(reqBody)
+                };
+                let that = this;
+                fetch(
+                        '/api/component/',
+                        opts)
+                        .then(function (response) {
+                            that.fire('files-saved', response);
+                            console.log(response);
+                        })
+                        .catch(function (error) {
+                            console.error(error);
+                        });
+            }
+        });
+    </script>
+</dom-module>
