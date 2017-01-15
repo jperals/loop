@@ -1,2 +1,4 @@
 components/
+!components/editor-router/
+!components/editor-stage/
 !components/looop-editor/

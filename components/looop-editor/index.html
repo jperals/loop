@@ -1,14 +1,15 @@
 <script src="/node_modules/webcomponents.js/webcomponents-lite.min.js"></script>
 <link rel="import" href="/node_modules/@polymer/polymer/polymer.html">
+<link rel="import" href="/components/editor-stage/editor-stage.html">
+<link rel="import" href="/components/editor-router/editor-router.html">
 
 <dom-module id="looop-editor">
     <template>
         <textarea id="code"></textarea>
         <input type="text" id="component-id">
         <button id="save-button">Save</button>
-        <template is="dom-if" if="{{ componentId }}">
-            <iframe src="/components/{{ componentId }}"></iframe>
-        </template>
+        <editor-stage id="stage"></editor-stage>
+        <editor-router id="state-manager"></editor-router>
     </template>
     <script>
         Polymer({
@@ -16,10 +17,43 @@
             properties: {
                 componentId: {
                     type: String
+                },
+                code: {
+                    type: String
+                },
+                dependencies: {
+                    type: Array
                 }
             },
             listeners: {
-                'save-button.tap': 'save'
+                'save-button.tap': 'save',
+                'load': 'load'
+            },
+            load: function(event) {
+                var componentId = event.detail;
+                let headers = new Headers();
+                headers.append('Content-Type', 'application/json');
+                let opts = {
+                    headers: headers,
+                    method: "GET"
+                };
+                let that = this;
+                console.log('Let\'s load', componentId);
+                fetch(
+                        '/api/component/' + componentId,
+                        opts)
+                        .then(function (response) {
+                            return response.text();
+                        })
+                        .then(function (response) {
+                            console.log(response);
+                            // TODO: manage dependencies
+                            that.$['stage'].fire('code', response)
+                        })
+                        .catch(function (error) {
+                            console.error(error);
+                            that.fire('error', error);
+                        });
             },
             save: function() {
                 console.log('save');
@@ -47,6 +81,7 @@
                         })
                         .catch(function (error) {
                             console.error(error);
+                            that.fire('error', error);
                         });
             }
         });

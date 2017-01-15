@@ -23,6 +23,19 @@ app.listen(PORT, function () {
     console.log('App listening on port ' + PORT + '!');
 });
 
+app.get('/api/component/:id', function(req, res) {
+    var componentId = req.params.id;
+    var code = '';
+    var mainFile = COMPONENTS_ROOT + '/' + componentId + '/index.html';
+    console.log('mainFile:', mainFile);
+    fs.readFile(mainFile, function(err, data) {
+        if(err) {
+            console.error(err);
+        }
+        res.send(data);
+    });
+});
+
 app.put('/api/component', function (req, res) {
     var code = req.body.code;
     var componentId = req.body.componentId;
