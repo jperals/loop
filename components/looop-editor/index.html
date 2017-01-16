@@ -1,11 +1,12 @@
 <script src="/node_modules/webcomponents.js/webcomponents-lite.min.js"></script>
 <link rel="import" href="/node_modules/@polymer/polymer/polymer.html">
+<link rel="import" href="/components/editor-code/editor-code.html">
 <link rel="import" href="/components/editor-stage/editor-stage.html">
 <link rel="import" href="/components/editor-router/editor-router.html">
 
 <dom-module id="looop-editor">
     <template>
-        <textarea id="code"></textarea>
+        <editor-code id="code"></editor-code>
         <input type="text" id="component-id">
         <button id="save-button">Save</button>
         <editor-stage id="stage"></editor-stage>
@@ -47,7 +48,8 @@
                         })
                         .then(function (response) {
                             console.log(response);
-                            // TODO: manage dependencies
+                            that.$['component-id'].value = componentId;
+                            that.$['code'].fire('code', response);
                             that.$['stage'].fire('code', response)
                         })
                         .catch(function (error) {
