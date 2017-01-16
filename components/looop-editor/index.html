@@ -5,10 +5,17 @@
 <link rel="import" href="/components/editor-router/editor-router.html">
 
 <dom-module id="looop-editor">
+    <style>
+        #editor-stage {
+            display: block;
+        }
+    </style>
     <template>
+        <div class="toolbar">
+            <input type="text" id="component-id">
+            <button id="save-button">Save</button>
+        </div>
         <editor-code id="code"></editor-code>
-        <input type="text" id="component-id">
-        <button id="save-button">Save</button>
         <editor-stage id="stage"></editor-stage>
         <editor-router id="state-manager"></editor-router>
     </template>
