@@ -59,7 +59,7 @@
             },
             save: function() {
                 console.log('save');
-                let content = this.$.code.value;
+                let content = this.$.code.getCode();
                 let componentId = this.$['component-id'].value;
                 let headers = new Headers();
                 headers.append('Content-Type', 'application/json');
