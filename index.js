@@ -25,7 +25,8 @@ app.listen(PORT, function () {
 
 app.get('/api/component/:id', function(req, res) {
     var path = req.params.id.split('/');
-    var mainFile = COMPONENTS_ROOT + '/' + path[0] + '/' + (path.length > 1 ? path[1] : 'index.html');
+    var componentId = path[0];
+    var mainFile = COMPONENTS_ROOT + '/' + componentId + '/' + (path.length > 1 ? path[1] : componentId + '.html');
     fs.readFile(mainFile, function(err, data) {
         if(err) {
             console.error(err);
