@@ -1,4 +1,4 @@
-components/
+components/*
 !components/editor-code/
 !components/editor-router/
 !components/editor-stage/

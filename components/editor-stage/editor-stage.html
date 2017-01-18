@@ -1,0 +1,29 @@
+<dom-module id="editor-stage">
+    <template>
+        <div id="stage-content"></div>
+    </template>
+    <script>
+        Polymer({
+            is: 'editor-stage',
+            listeners: {
+                'code': 'updateCode'
+            },
+            updateCode: function (event) {
+                console.log('event:', event);
+                var code = '';
+                var doc = document.implementation.createHTMLDocument('http://www.w3.org/1999/xhtml', 'html', null);
+                doc.documentElement.innerHTML = event.detail;
+                var importTags = doc.documentElement.querySelectorAll('link[rel="import"]');
+                for(let i = 0; i < importTags.length; i++) {
+                    let importTag = importTags[i];
+                    let target = importTag.getAttribute('href');
+                    Polymer.Base.importHref(target);
+                }
+                var templateElement = doc.documentElement.querySelector('dom-module template');
+                if(templateElement) {
+                    this.$['stage-content'].innerHTML = templateElement.innerHTML;
+                }
+            }
+        })
+    </script>
+</dom-module>

@@ -1,0 +1,19 @@
+<dom-module id="editor-code">
+    <template>
+        <textarea id="code"></textarea>
+    </template>
+    <script>
+        Polymer({
+            is: 'editor-code',
+            listeners: {
+                'code': 'updateCode'
+            },
+            getCode: function() {
+                return this.$.code.value;
+            },
+            updateCode: function(event) {
+                this.$.code.innerText = event.detail;
+            }
+        });
+    </script>
+</dom-module>

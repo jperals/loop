@@ -1,0 +1,45 @@
+<dom-module id="editor-router">
+    <script>
+        const routes = [
+            {
+                'action': 'load'
+            },
+            {
+                'action': 'save'
+            }
+        ];
+        console.log('router');
+        Polymer({
+            is: 'editor-router',
+            ready: function() {
+                console.log('ready');
+                var triggerAction = function () {
+                    let hashParts = window.location.hash.split('/');
+                    if(hashParts[0] == '#') {
+                        hashParts = hashParts.slice(1);
+                    }
+                    for(let i = 0; i < routes.length; i++) {
+                        let action = routes[i].action;
+                        if(action == hashParts[0]) {
+                            console.log('fire:', action, hashParts[1]);
+                            this.fire(action, hashParts[1]);
+                        }
+                    }
+                }.bind(this);
+                if(typeof window.onhashchange == 'function') {
+                    let onhashchangeOld = window.onhashchange;
+                    window.onhashchange = function() {
+                        onhashchangeOld();
+                        triggerAction();
+                    }
+                }
+                else {
+                    window.onhashchange = triggerAction;
+                }
+            },
+            updateCode: function (code) {
+                this.$.stage.innerHTML = code;
+            }
+        })
+    </script>
+</dom-module>
