@@ -1,0 +1,24 @@
+{
+  "name": "looop",
+  "description": "Web components editor",
+  "main": "index.js",
+  "authors": [
+    "Joan Perals Tresserra"
+  ],
+  "license": "ISC",
+  "keywords": [
+    "Web components",
+    "Polymer"
+  ],
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "app-route": "PolymerElements/app-route#^0.9.3"
+  }
+}
