@@ -24,9 +24,7 @@ app.listen(PORT, function () {
 });
 
 app.get('/api/component/:id', function(req, res) {
-    var path = req.params.id.split('/');
-    var componentId = path[0];
-    var mainFile = COMPONENTS_ROOT + '/' + componentId + '/' + (path.length > 1 ? path[1] : componentId + '.html');
+    var mainFile = getMainFilePath(req.params.id);
     fs.readFile(mainFile, function(err, data) {
         if(err) {
             console.error(err);
@@ -49,11 +47,13 @@ app.put('/api/component', function (req, res) {
             }
         }
         if (obj && obj[componentId]) {
-            console.warn("Element '" + componentId + "' already exists");
+            console.warn("Warning: element '" + componentId + "' already exists");
         }
         obj[componentId] = componentId;
         jsonfile.writeFile(COMPONENTS_JSON, obj, function (err) {
-            console.error(err);
+            if(err) {
+                console.error(err);
+            }
         });
         var newDir = COMPONENTS_ROOT + '/' + componentId;
         fs.mkdir(newDir, function (err) {
@@ -61,7 +61,7 @@ app.put('/api/component', function (req, res) {
                 console.error(err);
                 return;
             }
-            fs.writeFile(newDir + '/' + 'index.html', code, function () {
+            fs.writeFile(getMainFilePath(componentId), code, function () {
                 res.send({
                     componentId: req.params.componentId,
                     status: 'OK'
@@ -70,3 +70,10 @@ app.put('/api/component', function (req, res) {
         });
     });
 });
+
+function getMainFilePath(id) {
+    var path = id.split('/');
+    var filePath = COMPONENTS_ROOT + '/' + id + '/' + (path.length > 1 ? path[1] : id + '.html');
+    console.log('filePath:', filePath);
+    return filePath;
+}
