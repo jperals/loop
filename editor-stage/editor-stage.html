@@ -3,24 +3,30 @@
         <div id="stage-content"></div>
     </template>
     <script>
+        const stripOffTags = 'app-location, app-route';
         Polymer({
             is: 'editor-stage',
             listeners: {
                 'code': 'updateCode'
             },
             updateCode: function (event) {
-                console.log('event:', event);
-                var code = '';
                 var doc = document.implementation.createHTMLDocument('http://www.w3.org/1999/xhtml', 'html', null);
-                doc.documentElement.innerHTML = event.detail;
+                doc.documentElement.innerHTML = event.detail.code;
+                var basePath = event.detail.basePath;
                 var importTags = doc.documentElement.querySelectorAll('link[rel="import"]');
                 for(let i = 0; i < importTags.length; i++) {
                     let importTag = importTags[i];
-                    let target = importTag.getAttribute('href');
+                    let href = importTag.getAttribute('href');
+                    let target = typeof basePath == 'undefined' ? href : [basePath, href].join('/');
+                    console.log('target:', target);
                     Polymer.Base.importHref(target);
                 }
                 var templateElement = doc.documentElement.querySelector('dom-module template');
                 if(templateElement) {
+                    var toRemove = templateElement.content.querySelectorAll(stripOffTags);
+                    Array.prototype.forEach.call( toRemove, function( node ) {
+                        node.parentNode.removeChild( node );
+                    });
                     this.$['stage-content'].innerHTML = templateElement.innerHTML;
                 }
             }

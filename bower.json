@@ -1,24 +1,14 @@
 {
-  "name": "looop",
+  "name": "looop-editor",
   "description": "Web components editor",
-  "main": "index.js",
-  "authors": [
-    "Joan Perals Tresserra"
-  ],
-  "license": "ISC",
-  "keywords": [
-    "Web components",
-    "Polymer"
-  ],
-  "homepage": "",
-  "ignore": [
-    "**/.*",
-    "node_modules",
-    "components",
-    "test",
-    "tests"
-  ],
+  "main": "looop-editor.html",
   "dependencies": {
-    "app-route": "PolymerElements/app-route#^0.9.3"
+    "polymer": "Polymer/polymer#^1.4.0"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^1.0.0",
+    "web-component-tester": "^4.0.0",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0"
   }
 }

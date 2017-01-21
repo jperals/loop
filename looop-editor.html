@@ -1,8 +1,8 @@
-<script src="/node_modules/webcomponents.js/webcomponents-lite.min.js"></script>
-<link rel="import" href="/node_modules/@polymer/polymer/polymer.html">
-<link rel="import" href="/components/editor-code/editor-code.html">
-<link rel="import" href="/components/editor-stage/editor-stage.html">
-<link rel="import" href="/components/app-route/app-route.html">
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../app-route/app-location.html">
+<link rel="import" href="../app-route/app-route.html">
+<link rel="import" href="editor-code/editor-code.html">
+<link rel="import" href="editor-stage/editor-stage.html">
 
 <dom-module id="looop-editor">
     <style>
@@ -11,13 +11,26 @@
         }
     </style>
     <template>
+        <app-location route="{{route}}" use-hash-as-path></app-location>
+
+        <app-route
+                route="{{route}}"
+                pattern="/load"
+                tail="{{loadPathData}}">
+        </app-route>
+
+        <app-route
+                route="{{route}}"
+                pattern="/save"
+                tail="{{savePathData}}">
+        </app-route>
+
         <div class="toolbar">
             <input type="text" id="component-id">
             <button id="save-button">Save</button>
         </div>
         <editor-code id="code"></editor-code>
         <editor-stage id="stage"></editor-stage>
-        <editor-router id="state-manager"></editor-router>
     </template>
     <script>
         Polymer({
@@ -31,14 +44,42 @@
                 },
                 dependencies: {
                     type: Array
+                },
+                route: {
+                    type: Object
+                },
+                tail: {
+                    type: Boolean
+                },
+                loadPathData: {
+                    type: Object
+                },
+                savePathData: {
+                    type: Object
                 }
             },
             listeners: {
                 'save-button.tap': 'save',
                 'load': 'load'
             },
-            load: function(event) {
-                var componentId = event.detail;
+            observers: [
+                '_onLoadPathChanged(loadPathData)',
+                '_onSavePathChanged(savePathData)',
+                '_viewChanged(actionData.view)'
+            ],
+            _onLoadPathChanged: function (data) {
+                if(data.path) {
+//                    console.log(path);
+                    this._load(data.path.replace(/^\/+/g, ''));
+                }
+            },
+            _onSavePathChanged: function (data) {
+                if(data.path) {
+//                    console.log(path);
+                    this._save(data.path.replace(/^\/+/g, ''));
+                }
+            },
+            _load: function(componentId) {
                 let headers = new Headers();
                 headers.append('Content-Type', 'application/json');
                 let opts = {
@@ -46,25 +87,27 @@
                     method: "GET"
                 };
                 let that = this;
-                console.log('Let\'s load', componentId);
+//                console.log('Let\'s load', componentId);
                 fetch(
-                        '/api/component/' + componentId,
+                        componentId,
                         opts)
                         .then(function (response) {
                             return response.text();
                         })
                         .then(function (response) {
-                            console.log(response);
+//                            console.log(response);
                             that.$['component-id'].value = componentId;
                             that.$['code'].fire('code', response);
-                            that.$['stage'].fire('code', response)
+                            that.$['stage'].fire('code', {
+                                code: response
+                            })
                         })
                         .catch(function (error) {
                             console.error(error);
                             that.fire('error', error);
                         });
             },
-            save: function() {
+            _save: function() {
                 console.log('save');
                 let content = this.$.code.getCode();
                 let componentId = this.$['component-id'].value;
@@ -92,6 +135,13 @@
                             console.error(error);
                             that.fire('error', error);
                         });
+            },
+            load: function (event) {
+                var componentId = event.detail;
+                this.load(componentId);
+            },
+            save: function (event) {
+                this.save();
             }
         });
     </script>
