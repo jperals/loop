@@ -18,7 +18,6 @@
                     let importTag = importTags[i];
                     let href = importTag.getAttribute('href');
                     let target = typeof basePath == 'undefined' ? href : [basePath, href].join('/');
-                    console.log('target:', target);
                     Polymer.Base.importHref(target);
                 }
                 var templateElement = doc.documentElement.querySelector('dom-module template');
