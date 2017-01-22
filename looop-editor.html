@@ -15,18 +15,19 @@
 
         <app-route
                 route="{{route}}"
-                pattern="/load"
-                tail="{{loadPathData}}">
+                pattern="/load/:loadPath"
+                data="{{loadPathData}}">
         </app-route>
 
         <app-route
                 route="{{route}}"
-                pattern="/save"
-                tail="{{savePathData}}">
+                pattern="/save/:savePath"
+                data="{{savePathData}}">
         </app-route>
 
         <div class="toolbar">
             <input type="text" id="file-path">
+            <button id="load-button">Load</button>
             <button id="save-button">Save</button>
         </div>
         <editor-code id="code"></editor-code>
@@ -59,8 +60,8 @@
                 }
             },
             listeners: {
-                'save-button.tap': 'save',
-                'load': 'load'
+                'load-button.tap': '_loadAction',
+                'save-button.tap': '_saveAction'
             },
             observers: [
                 '_onLoadPathChanged(loadPathData)',
@@ -68,15 +69,15 @@
                 '_viewChanged(actionData.view)'
             ],
             _onLoadPathChanged: function (data) {
-                if(data.path) {
-//                    console.log(path);
-                    this._load(data.path.replace(/^\/+/g, ''));
+                if(data.loadPath) {
+                    console.log('Load ', data.loadPath);
+                    this._load(data.loadPath.replace(/^\/+/g, ''));
                 }
             },
             _onSavePathChanged: function (data) {
-                if(data.path) {
-//                    console.log(path);
-                    this._save(data.path.replace(/^\/+/g, ''));
+                if(data.savePathData) {
+                    console.log('Save ', data.savePath);
+                    this._save(data.savePath.replace(/^\/+/g, ''));
                 }
             },
             _load: function(filePath) {
@@ -135,11 +136,11 @@
                             that.fire('error', error);
                         });
             },
-            load: function (event) {
-                var filePath = event.detail;
-                this._load(filePath);
+            _loadAction: function (event) {
+                var filePath = this.$['file-path'].value;
+                this.set('loadPathData.loadPath', filePath);
             },
-            save: function (event) {
+            _saveAction: function (event) {
                 this._save();
             }
         });
