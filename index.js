@@ -4,10 +4,17 @@ const bodyParser = require('body-parser');
 const jsonfile = require('jsonfile');
 
 const PORT = 3001;
-const COMPONENTS_ROOT = 'components';
-const COMPONENTS_JSON = 'components/components.json';
+const COMPONENTS_ROOT = '.';
+const COMPONENTS_JSON = [COMPONENTS_ROOT, 'components.json'].join('/');
 
 var app = express();
+
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
 
 app.use(function (req, res, next) {
     console.log(req.originalUrl);
@@ -20,7 +27,7 @@ app.use(express.static('./'));
 app.use('/components', express.static(COMPONENTS_ROOT));
 
 app.listen(PORT, function () {
-    console.log('App listening on port ' + PORT + '!');
+    console.log('Backend listening on port ' + PORT + '\n');
 });
 
 app.get('/api/component/:id', function(req, res) {
@@ -33,9 +40,11 @@ app.get('/api/component/:id', function(req, res) {
     });
 });
 
-app.put('/api/component', function (req, res) {
+app.put('/api/file', function (req, res) {
     var code = req.body.code;
-    var componentId = req.body.componentId;
+    var filePath = req.body.filePath;
+    console.log('Code:', code);
+    console.log('File path:', filePath);
     jsonfile.readFile(COMPONENTS_JSON, function (err, obj) {
         if (err) {
             if(err.code === 'ENOENT') {
@@ -46,27 +55,20 @@ app.put('/api/component', function (req, res) {
                 return;
             }
         }
-        if (obj && obj[componentId]) {
-            console.warn("Warning: element '" + componentId + "' already exists");
+        if (obj && obj[filePath]) {
+            console.warn("Warning: element '" + filePath + "' already exists");
         }
-        obj[componentId] = componentId;
+        obj[filePath] = filePath;
         jsonfile.writeFile(COMPONENTS_JSON, obj, function (err) {
             if(err) {
                 console.error(err);
             }
         });
-        var newDir = COMPONENTS_ROOT + '/' + componentId;
-        fs.mkdir(newDir, function (err) {
-            if(err && err.code !== 'EEXIST') {
-                console.error(err);
-                return;
-            }
-            fs.writeFile(getMainFilePath(componentId), code, function () {
-                res.send({
-                    componentId: req.params.componentId,
-                    status: 'OK'
-                });
-            })
+        fs.writeFile(filePath, code, function () {
+            res.send({
+                filePath: filePath,
+                status: 'OK'
+            });
         });
     });
 });

@@ -1,5 +1,7 @@
+components.json
 components/*
 !components/editor-code/
 !components/editor-router/
 !components/editor-stage/
 !components/looop-editor/
+npm-debug.log

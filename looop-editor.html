@@ -26,7 +26,7 @@
         </app-route>
 
         <div class="toolbar">
-            <input type="text" id="component-id">
+            <input type="text" id="file-path">
             <button id="save-button">Save</button>
         </div>
         <editor-code id="code"></editor-code>
@@ -36,7 +36,7 @@
         Polymer({
             is: 'looop-editor',
             properties: {
-                componentId: {
+                filePath: {
                     type: String
                 },
                 code: {
@@ -79,7 +79,7 @@
                     this._save(data.path.replace(/^\/+/g, ''));
                 }
             },
-            _load: function(componentId) {
+            _load: function(filePath) {
                 let headers = new Headers();
                 headers.append('Content-Type', 'application/json');
                 let opts = {
@@ -87,16 +87,15 @@
                     method: "GET"
                 };
                 let that = this;
-//                console.log('Let\'s load', componentId);
                 fetch(
-                        componentId,
+                        filePath,
                         opts)
                         .then(function (response) {
                             return response.text();
                         })
                         .then(function (response) {
 //                            console.log(response);
-                            that.$['component-id'].value = componentId;
+                            that.$['file-path'].value = filePath;
                             that.$['code'].fire('code', response);
                             that.$['stage'].fire('code', {
                                 code: response
@@ -110,12 +109,12 @@
             _save: function() {
                 console.log('save');
                 let content = this.$.code.getCode();
-                let componentId = this.$['component-id'].value;
+                let filePath = this.$['file-path'].value;
                 let headers = new Headers();
                 headers.append('Content-Type', 'application/json');
                 let reqBody = {
                     code: content,
-                    componentId: componentId
+                    filePath: filePath
                 };
                 let opts = {
                     headers: headers,
@@ -124,10 +123,10 @@
                 };
                 let that = this;
                 fetch(
-                        '/api/component/',
+                        window.location.protocol + '//' + window.location.hostname + ':3001' + '/api/file',
                         opts)
                         .then(function (response) {
-                            that.componentId = componentId;
+                            that.componentId = filePath;
                             that.fire('files-saved', response);
                             console.log(response);
                         })
@@ -137,11 +136,11 @@
                         });
             },
             load: function (event) {
-                var componentId = event.detail;
-                this.load(componentId);
+                var filePath = event.detail;
+                this._load(filePath);
             },
             save: function (event) {
-                this.save();
+                this._save();
             }
         });
     </script>
