@@ -15,15 +15,13 @@
 
         <app-route
                 route="{{route}}"
-                pattern="/load/:loadPath"
-                data="{{loadPathData}}">
+                pattern="/:action"
+                data="{{routeActionData}}"
+                tail="{{filePathData}}">
         </app-route>
 
         <app-route
-                route="{{route}}"
-                pattern="/save/:savePath"
-                data="{{savePathData}}">
-        </app-route>
+                route="{{filePathData}}"></app-route>
 
         <div class="toolbar">
             <input type="text" id="file-path">
@@ -52,10 +50,7 @@
                 tail: {
                     type: Boolean
                 },
-                loadPathData: {
-                    type: Object
-                },
-                savePathData: {
+                filePathData: {
                     type: Object
                 }
             },
@@ -64,23 +59,21 @@
                 'save-button.tap': '_saveAction'
             },
             observers: [
-                '_onLoadPathChanged(loadPathData)',
-                '_onSavePathChanged(savePathData)',
-                '_viewChanged(actionData.view)'
+                '_onRouteChanged(filePathData)'
             ],
-            _onLoadPathChanged: function (data) {
-                if(data.loadPath) {
-                    console.log('Load ', data.loadPath);
-                    this._load(data.loadPath.replace(/^\/+/g, ''));
+            _onRouteChanged: function (data) {
+                if (data.path && this.routeActionData) {
+                    let path = data.path.replace(/^\/+/g, '');
+                    switch(this.routeActionData.action) {
+                        case 'load':
+                            this._load(path);
+                            break;
+                        case 'save':
+                            this._save(path);
+                    }
                 }
             },
-            _onSavePathChanged: function (data) {
-                if(data.savePathData) {
-                    console.log('Save ', data.savePath);
-                    this._save(data.savePath.replace(/^\/+/g, ''));
-                }
-            },
-            _load: function(filePath) {
+            _load: function (filePath) {
                 let headers = new Headers();
                 headers.append('Content-Type', 'application/json');
                 let opts = {
@@ -107,7 +100,7 @@
                             that.fire('error', error);
                         });
             },
-            _save: function() {
+            _save: function () {
                 console.log('save');
                 let content = this.$.code.getCode();
                 let filePath = this.$['file-path'].value;
@@ -138,7 +131,7 @@
             },
             _loadAction: function (event) {
                 var filePath = this.$['file-path'].value;
-                this.set('loadPathData.loadPath', filePath);
+                this.set('filePathData.path', filePath);
             },
             _saveAction: function (event) {
                 this._save();
