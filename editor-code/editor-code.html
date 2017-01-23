@@ -35,10 +35,9 @@
                 });
             },
             getCode: function() {
-                return this.$.code.value;
+                return this.codeMirror.getValue();
             },
             updateCode: function(event) {
-                this.$.code.innerText = event.detail;
                 this.codeMirror.setValue(event.detail);
             }
         });
