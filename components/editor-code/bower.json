@@ -1,0 +1,25 @@
+{
+  "name": "editor-code",
+  "authors": [
+    "Joan Perals"
+  ],
+  "description": "Codemirror web component",
+  "main": "",
+  "keywords": [
+    "Codemirror",
+    "Web components",
+    "Polymer"
+  ],
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "codemirror": "^5.22.2"
+  }
+}
