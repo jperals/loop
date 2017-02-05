@@ -1,5 +1,5 @@
 const express = require('express');
-const fs = require('fs');
+const fs = require('fs-extra');
 const bodyParser = require('body-parser');
 const jsonfile = require('jsonfile');
 
@@ -36,11 +36,15 @@ app.get('/api/components', function(req, res) {
             let fileName = fileNames[i];
             let filePath = [COMPONENTS_ROOT, fileName].join('/');
             if(fs.lstatSync(filePath).isDirectory() && isComponent(fileName)) {
-                dirs.push(fileName);
+                dirs.push({
+                    name: fileName
+                });
             }
         }
         res.json({
-            data: dirs
+            data: {
+                components: dirs
+            }
         })
     });
 });
@@ -58,6 +62,8 @@ app.get('/api/component/:id', function(req, res) {
 app.put('/api/file', function (req, res) {
     var code = req.body.code;
     var filePath = req.body.filePath;
+    var filePathSplit = filePath.split('/');
+    var dir = filePathSplit.splice(0, filePathSplit.length-1).join('/');
     console.log('Code:', code);
     console.log('File path:', filePath);
     jsonfile.readFile(COMPONENTS_JSON, function (err, obj) {
@@ -79,12 +85,20 @@ app.put('/api/file', function (req, res) {
                 console.error(err);
             }
         });
-        fs.writeFile(filePath, code, function () {
-            res.send({
-                filePath: filePath,
-                status: 'OK'
-            });
-        });
+        fs.ensureDir(dir, function(err) {
+            if(err) {
+                res.status(500).send({ error: err });
+                console.error(err);
+            }
+            else {
+                fs.writeFile(filePath, code, function () {
+                    res.send({
+                        filePath: filePath,
+                        status: 'OK'
+                    });
+                });
+            }
+        })
     });
 });
 
