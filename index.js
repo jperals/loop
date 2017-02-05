@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const jsonfile = require('jsonfile');
 
 const PORT = 3001;
-const COMPONENTS_ROOT = '.';
+const COMPONENTS_ROOT = './components';
 const COMPONENTS_JSON = [COMPONENTS_ROOT, 'components.json'].join('/');
 
 var app = express();
@@ -24,10 +24,25 @@ app.use(function (req, res, next) {
 app.use(bodyParser.json());
 
 app.use(express.static('./'));
-app.use('/components', express.static(COMPONENTS_ROOT));
 
 app.listen(PORT, function () {
     console.log('Backend listening on port ' + PORT + '\n');
+});
+
+app.get('/api/components', function(req, res) {
+    var dirs = [];
+    fs.readdir(COMPONENTS_ROOT, function(err, fileNames) {
+        for(let i = 0; i < fileNames.length; i++) {
+            let fileName = fileNames[i];
+            let filePath = [COMPONENTS_ROOT, fileName].join('/');
+            if(fs.lstatSync(filePath).isDirectory() && isComponent(fileName)) {
+                dirs.push(fileName);
+            }
+        }
+        res.json({
+            data: dirs
+        })
+    });
 });
 
 app.get('/api/component/:id', function(req, res) {
@@ -78,4 +93,8 @@ function getMainFilePath(id) {
     var filePath = COMPONENTS_ROOT + '/' + id + '/' + (path.length > 1 ? path[1] : id + '.html');
     console.log('filePath:', filePath);
     return filePath;
+}
+
+function isComponent(dirName) {
+    return true;
 }
