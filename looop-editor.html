@@ -24,6 +24,7 @@
             <input type="text" id="file-path">
             <button id="load-button">Load</button>
             <button id="save-button">Save</button>
+            <button id="new-button">New</button>
         </div>
         <editor-code id="code"></editor-code>
         <editor-stage id="stage"></editor-stage>
@@ -49,11 +50,15 @@
                 },
                 filePathData: {
                     type: Object
+                },
+                routeActionData: {
+                    type: Object
                 }
             },
             listeners: {
                 'load-button.tap': '_loadAction',
-                'save-button.tap': '_saveAction'
+                'save-button.tap': '_saveAction',
+                'new-button.tap': '_newAction'
             },
             observers: [
                 '_onRouteChanged(filePathData)'
@@ -131,6 +136,12 @@
             },
             _saveAction: function (event) {
                 this._save();
+            },
+            _newAction: function (event) {
+                this.$['file-path'].value = '';
+                this.set('routeActionData.action', 'new');
+                this.$['code'].fire('clear');
+                this.$['stage'].fire('clear');
             }
         });
     </script>
