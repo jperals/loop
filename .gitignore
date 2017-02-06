@@ -1,6 +1,2 @@
 components.json
-components/*
-!components/component-palette/
-!components/editor-code/
-!components/editor-stage/
 npm-debug.log
