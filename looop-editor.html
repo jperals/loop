@@ -95,9 +95,10 @@
                             that.$['file-path'].value = filePath;
                             that.$['code'].fire('code', response);
                             that.$['stage'].fire('code', {
-                                code: response
+                                code: response,
+                                basePath: this._getBasePath(filePath)
                             })
-                        })
+                        }.bind(this))
                         .catch(function (error) {
                             console.error(error);
                             that.fire('error', error);
@@ -144,6 +145,10 @@
                 this.set('routeActionData.action', 'new');
                 this.$['code'].fire('clear');
                 this.$['stage'].fire('clear');
+            },
+            _getBasePath: function (uri) {
+                var splitUri = uri.split('/');
+                return splitUri.splice(0, splitUri.length - 1).join('/');
             }
         });
     </script>
