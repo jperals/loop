@@ -1,7 +1,6 @@
 components.json
 components/*
+!components/component-palette/
 !components/editor-code/
-!components/editor-router/
 !components/editor-stage/
-!components/looop-editor/
 npm-debug.log

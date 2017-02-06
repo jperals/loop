@@ -1,0 +1,41 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<dom-module id="component-palette">
+  <style>
+  </style>
+  <template>
+    <template is="dom-repeat" items="{{components}}">
+      <div><a href="#/load/components/{{ item.name }}/{{ item.name }}.html">{{ item.name }}</a></div>
+    </template>
+  </template>
+  <script>
+    Polymer({
+      is: 'component-palette',
+      properties: {
+        components: {
+          type: Array,
+          value: []
+        }
+      },
+      ready: function () {
+        let headers = new Headers();
+        headers.append('Content-Type', 'application/json');
+        let opts = {
+          headers: headers,
+          method: "GET"
+        };
+        let that = this;
+        fetch(
+          window.location.protocol + '//' + window.location.hostname + ':3001' + '/api/components',
+          opts)
+          .then(function (response) {
+            return response.text();
+          })
+          .then(function (response) {
+            let res = JSON.parse(response);
+          	that.components = res.data.components;
+        })
+      }
+    });
+  </script>
+</dom-module>
