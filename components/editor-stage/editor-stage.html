@@ -1,4 +1,10 @@
 <dom-module id="editor-stage">
+    <style>
+        #iframe {
+            border-width: 2px 0 0 0;
+            width: 100%;
+        }
+    </style>
     <template>
         <iframe id="iframe" src="{{ filePath }}"></iframe>
     </template>
@@ -11,7 +17,7 @@
                 'file': '_updateFilePath'
             },
             _code: function (event) {
-                this._updateCode( event.detail.code );
+                this._updateCode( event.detail );
             },
             _updateCode: function (code) {
                 this.$.iframe.contentDocument.querySelector('body').innerHTML = code;

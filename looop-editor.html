@@ -7,9 +7,25 @@
 
 <dom-module id="looop-editor">
     <style>
-        #editor-stage {
-            display: block;
+        :host {
+            height: 100%;
         }
+        #toolbar {
+            border-bottom: 1px solid lightgray;
+        }
+        #main {
+            display: flex;
+            position: relative;
+        }
+        #editor,
+        #component-palette {
+            width: calc(100% - 120px);
+        }
+      	#component-palette {
+            border-left: 1px solid lightgray;
+            padding: 10px;
+            width: 100px;
+      	}
     </style>
     <template>
         <app-location route="{{route}}" use-hash-as-path></app-location>
@@ -21,15 +37,20 @@
                 tail="{{filePathData}}">
         </app-route>
 
-        <div class="toolbar">
+        <div id="toolbar">
             <input type="text" id="file-path">
             <button id="load-button">Load</button>
             <button id="save-button">Save</button>
             <button id="new-button">New</button>
+            <button id="update-button">Update</button>
         </div>
-        <editor-code id="code"></editor-code>
-        <editor-stage id="stage"></editor-stage>
-        <component-palette></component-palette>
+        <div id="main">
+            <div id="editor">
+                <editor-code id="code"></editor-code>
+                <editor-stage id="stage"></editor-stage>
+            </div>
+	        <component-palette id="component-palette"></component-palette>
+        </div>
     </template>
     <script>
         Polymer({
@@ -60,7 +81,8 @@
             listeners: {
                 'load-button.tap': '_loadAction',
                 'save-button.tap': '_saveAction',
-                'new-button.tap': '_newAction'
+                'new-button.tap': '_newAction',
+                'update-button.tap': '_updateAction'
             },
             observers: [
                 '_onRouteChanged(filePathData)'
@@ -144,6 +166,10 @@
                 this.set('routeActionData.action', 'new');
                 this.$['code'].fire('clear');
                 this.$['stage'].fire('clear');
+            },
+            _updateAction: function (event) {
+                var code = this.$['code'].getCode();
+                this.$['stage'].fire('code', code);
             },
             _getBasePath: function (uri) {
                 var splitUri = uri.split('/');
