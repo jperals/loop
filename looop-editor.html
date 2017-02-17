@@ -94,10 +94,9 @@
                         .then(function (response) {
                             that.$['file-path'].value = filePath;
                             that.$['code'].fire('code', response);
-                            that.$['stage'].fire('code', {
-                                code: response,
-                                basePath: this._getBasePath(filePath)
-                            })
+                            that.$['stage'].fire('file', {
+                               file: filePath
+                            });
                         }.bind(this))
                         .catch(function (error) {
                             console.error(error);

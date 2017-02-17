@@ -1,37 +1,40 @@
 <dom-module id="editor-stage">
     <template>
-        <div id="stage-content"></div>
+        <iframe id="iframe" src="{{ filePath }}"></iframe>
     </template>
     <script>
-        const stripOffTags = 'app-location, app-route';
         Polymer({
             is: 'editor-stage',
             listeners: {
-                'code': 'updateCode',
-                'clear': '_clear'
+                'code': '_code',
+                'clear': '_clear',
+                'file': '_updateFilePath'
             },
-            updateCode: function (event) {
-                var doc = document.implementation.createHTMLDocument('http://www.w3.org/1999/xhtml', 'html', null);
-                doc.documentElement.innerHTML = event.detail.code;
-                var basePath = event.detail.basePath;
-                var importTags = doc.documentElement.querySelectorAll('link[rel="import"]');
-                for(let i = 0; i < importTags.length; i++) {
-                    let importTag = importTags[i];
-                    let href = importTag.getAttribute('href');
-                    let target = typeof basePath == 'undefined' ? href : [basePath, href].join('/');
-                    Polymer.Base.importHref(target);
-                }
-                var templateElement = doc.documentElement.querySelector('dom-module template');
-                if(templateElement) {
-                    var toRemove = templateElement.content.querySelectorAll(stripOffTags);
-                    Array.prototype.forEach.call( toRemove, function( node ) {
-                        node.parentNode.removeChild( node );
-                    });
-                    this.$['stage-content'].innerHTML = templateElement.innerHTML;
-                }
+            _code: function (event) {
+                this._updateCode( event.detail.code );
             },
-            _clear: function() {
-                this.$['stage-content'].innerHTML = '';
+            _updateCode: function (code) {
+                this.$.iframe.contentDocument.querySelector('body').innerHTML = code;
+                this._addElement();
+            },
+            _clear: function () {
+                this._updateCode('');
+            },
+            _updateFilePath: function (event) {
+                this.filePath = event.detail.file;
+                this.$.iframe.onload = this._addElement.bind(this);
+            },
+            _addElement: function () {
+                var frameDocument = this.$.iframe.contentDocument;
+                var frameBody = frameDocument.querySelector('body');
+                if (frameBody) {
+                    let module = frameBody.querySelector('dom-module');
+                    if (module) {
+                        let id = module.getAttribute('id');
+                        let el = document.createElement(id);
+                        frameBody.appendChild(el);
+                    }
+                }
             }
         })
     </script>
