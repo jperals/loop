@@ -1,0 +1,25 @@
+<script src="../webcomponentsjs/webcomponents-lite.js"></script>
+<link rel="import" href="../polymer/polymer.html">
+
+<dom-module id="editable-paragraph">
+    <style>
+    </style>
+    <template>
+        <p id="dynamic-content" contenteditable="true">{{ textContent }}</p>
+    </template>
+    <script>
+        Polymer({
+            is: 'editable-paragraph',
+            properties: {
+                textContent: {
+                    type: String,
+                    value: 'hello'
+                }
+            },
+            ready: function() {
+                console.log('ready');
+                this.textContent = 'hey!';
+            }
+        });
+    </script>
+</dom-module>
