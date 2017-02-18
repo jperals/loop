@@ -1,8 +1,15 @@
+<script src="../webcomponentsjs/webcomponents-lite.js"></script>
+<link rel="import" href="../polymer/polymer.html">
+
 <dom-module id="editor-stage">
     <style>
+        :host {
+            display: block;
+        }
         #iframe {
             border-width: 2px 0 0 0;
             width: 100%;
+            height: 100%;
         }
     </style>
     <template>
@@ -21,19 +28,20 @@
             },
             _updateCode: function (code) {
                 this.$.iframe.contentDocument.querySelector('body').innerHTML = code;
-                this._addElement();
+                this.$.iframe.contentDocument.addEventListener("DOMContentLoaded", this._addElement.bind(this));
             },
             _clear: function () {
                 this._updateCode('');
             },
             _updateFilePath: function (event) {
-                this.filePath = event.detail.file;
+                this.filePath = '/' + event.detail.file;
                 this.$.iframe.onload = this._addElement.bind(this);
             },
             _addElement: function () {
                 var frameDocument = this.$.iframe.contentDocument;
                 var frameBody = frameDocument.querySelector('body');
                 if (frameBody) {
+                    frameBody.style.margin = 0;
                     let module = frameBody.querySelector('dom-module');
                     if (module) {
                         let id = module.getAttribute('id');

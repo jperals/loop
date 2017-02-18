@@ -2,6 +2,15 @@
 <link rel="import" href="../polymer/polymer.html">
 
 <dom-module id="editor-code">
+    <style>
+        :host {
+            display: block;
+        }
+        .CodeMirror {
+            height: 100% !important;
+            position: relative;
+        }
+    </style>
     <link rel="stylesheet" href="bower_components/codemirror/lib/codemirror.css">
     <link rel="stylesheet" href="bower_components/codemirror/theme/xq-light.css">
     <link rel="stylesheet" href="bower_components/codemirror/addon/fold/foldgutter.css">
