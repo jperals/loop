@@ -2,10 +2,14 @@
 
 <dom-module id="component-palette">
   <style>
+      .component {
+          padding: 10px;
+          border-bottom: 1px solid lightgray;
+      }
   </style>
   <template>
     <template is="dom-repeat" items="{{components}}">
-      <div><a href="#/load/components/{{ item.name }}/{{ item.name }}.html">{{ item.name }}</a></div>
+      <div class="component"><a href="#/load/components/{{ item.name }}/{{ item.name }}.html">{{ item.name }}</a></div>
     </template>
   </template>
   <script>
