@@ -9,7 +9,7 @@
   </style>
   <template>
     <template is="dom-repeat" items="{{components}}">
-      <div class="component"><a href="#/load/components/{{ item.name }}/{{ item.name }}.html">{{ item.name }}</a></div>
+      <div class="component"><a href="#/load/{{ item.name }}">{{ item.name }}</a></div>
     </template>
   </template>
   <script>

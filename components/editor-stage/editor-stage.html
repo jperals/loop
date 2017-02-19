@@ -6,14 +6,15 @@
         :host {
             display: block;
         }
-        #iframe {
+        #frame {
             border-width: 2px 0 0 0;
             width: 100%;
             height: 100%;
         }
     </style>
     <template>
-        <iframe id="iframe" src="{{ filePath }}"></iframe>
+        <div id="frame">
+        </div>
     </template>
     <script>
         Polymer({
@@ -21,34 +22,32 @@
             listeners: {
                 'code': '_code',
                 'clear': '_clear',
-                'file': '_updateFilePath'
+                'file': '_updateFilePath',
+                'component': '_updateComponent'
             },
             _code: function (event) {
                 this._updateCode( event.detail );
             },
             _updateCode: function (code) {
-                this.$.iframe.contentDocument.querySelector('body').innerHTML = code;
-                this.$.iframe.contentDocument.addEventListener("DOMContentLoaded", this._addElement.bind(this));
+                this.$.frame.innerHTML = code;
+                this.$.frame.addEventListener("DOMContentLoaded", this._addElement.bind(this));
             },
             _clear: function () {
                 this._updateCode('');
             },
             _updateFilePath: function (event) {
                 this.filePath = '/' + event.detail.file;
-                this.$.iframe.onload = this._addElement.bind(this);
+//                this.$.iframe.onload = this._addElement.bind(this);
+                Polymer.Base.importHref(this.filePath, this._addElement.bind(this));
+                this._addElement();
             },
-            _addElement: function () {
-                var frameDocument = this.$.iframe.contentDocument;
-                var frameBody = frameDocument.querySelector('body');
-                if (frameBody) {
-                    frameBody.style.margin = 0;
-                    let module = frameBody.querySelector('dom-module');
-                    if (module) {
-                        let id = module.getAttribute('id');
-                        let el = document.createElement(id);
-                        frameBody.appendChild(el);
-                    }
-                }
+            _addElement: function ( componentId ) {
+                let el = document.createElement(componentId);
+                this.$.frame.appendChild(el);
+            },
+            _updateComponent: function (event) {
+                this._updateCode('');
+                this._addElement( event.detail );
             }
         })
     </script>

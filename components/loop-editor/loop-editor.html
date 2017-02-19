@@ -4,7 +4,6 @@
 <link rel="import" href="../editor-code/editor-code.html">
 <link rel="import" href="../editor-stage/editor-stage.html">
 <link rel="import" href="../component-palette/component-palette.html">
-<link rel="import" href="../editable-paragraph/editable-paragraph.html">
 
 <dom-module id="looop-editor">
     <style>
@@ -58,11 +57,11 @@
                 route="{{route}}"
                 pattern="/:action"
                 data="{{routeActionData}}"
-                tail="{{filePathData}}">
+                tail="{{componentIdData}}">
         </app-route>
 
         <div id="toolbar">
-            <input type="text" id="file-path">
+            <input type="text" id="component-id">
             <button id="load-button">Load</button>
             <button id="save-button">Save</button>
             <button id="new-button">New</button>
@@ -80,7 +79,7 @@
         Polymer({
             is: 'looop-editor',
             properties: {
-                filePath: {
+                componentId: {
                     type: String
                 },
                 code: {
@@ -95,7 +94,7 @@
                 tail: {
                     type: Boolean
                 },
-                filePathData: {
+                componentIdData: {
                     type: Object
                 },
                 routeActionData: {
@@ -109,8 +108,11 @@
                 'update-button.tap': '_updateAction'
             },
             observers: [
-                '_onRouteChanged(filePathData)'
+                '_onRouteChanged(componentIdData)'
             ],
+            ready: function () {
+                this._importAllComponents();
+            },
             _onRouteChanged: function (data) {
                 if (data.path && this.routeActionData) {
                     let path = data.path.replace(/^\/+/g, '');
@@ -123,7 +125,7 @@
                     }
                 }
             },
-            _load: function (filePath) {
+            _load: function (componentId) {
                 let headers = new Headers();
                 headers.append('Content-Type', 'application/json');
                 let opts = {
@@ -132,17 +134,15 @@
                 };
                 let that = this;
                 fetch(
-                        filePath,
+                        window.location.protocol + '//' + window.location.hostname + ':3001' + '/api/component/' + componentId,
                         opts)
                         .then(function (response) {
                             return response.text();
                         })
                         .then(function (response) {
-                            that.$['file-path'].value = filePath;
+                            that.$['component-id'].value = componentId;
                             that.$['code'].fire('code', response);
-                            that.$['stage'].fire('file', {
-                               file: filePath
-                            });
+                            that.$['stage'].fire('component', componentId);
                         }.bind(this))
                         .catch(function (error) {
                             console.error(error);
@@ -152,12 +152,12 @@
             _save: function () {
                 console.log('save');
                 let content = this.$.code.getCode();
-                let filePath = this.$['file-path'].value;
+                let componentId = this.$['component-id'].value;
                 let headers = new Headers();
                 headers.append('Content-Type', 'application/json');
                 let reqBody = {
                     code: content,
-                    filePath: filePath
+                    componentId: componentId
                 };
                 let opts = {
                     headers: headers,
@@ -166,10 +166,10 @@
                 };
                 let that = this;
                 fetch(
-                        window.location.protocol + '//' + window.location.hostname + ':3001' + '/api/file',
+                        window.location.protocol + '//' + window.location.hostname + ':3001' + '/api/component',
                         opts)
                         .then(function (response) {
-                            that.componentId = filePath;
+                            that.componentId = componentId;
                             that.fire('files-saved', response);
                             console.log(response);
                         })
@@ -179,14 +179,14 @@
                         });
             },
             _loadAction: function (event) {
-                var filePath = this.$['file-path'].value;
-                this.set('filePathData.path', filePath);
+                var componentId = this.$['component-id'].value;
+                this.set('componentIdData.path', componentId);
             },
             _saveAction: function (event) {
                 this._save();
             },
             _newAction: function (event) {
-                this.$['file-path'].value = '';
+                this.$['component-id'].value = '';
                 this.set('routeActionData.action', 'new');
                 this.$['code'].fire('clear');
                 this.$['stage'].fire('clear');
@@ -198,6 +198,28 @@
             _getBasePath: function (uri) {
                 var splitUri = uri.split('/');
                 return splitUri.splice(0, splitUri.length - 1).join('/');
+            },
+            _importAllComponents: function () {
+                let headers = new Headers();
+                headers.append('Content-Type', 'application/json');
+                let opts = {
+                  headers: headers,
+                  method: "GET"
+                };
+                let that = this;
+                fetch(
+                  window.location.protocol + '//' + window.location.hostname + ':3001' + '/api/components',
+                  opts)
+                  .then(function (response) {
+                    return response.text();
+                  })
+                  .then(function (response) {
+                    let res = JSON.parse(response);
+                    let components = res.data.components;
+                    components.forEach(function(component) {
+                        Polymer.Base.importHref(component.path);
+                    });
+                })
             }
         });
     </script>

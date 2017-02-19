@@ -37,7 +37,8 @@ app.get('/api/components', function(req, res) {
             let filePath = [COMPONENTS_ROOT, fileName].join('/');
             if(fs.lstatSync(filePath).isDirectory() && isComponent(fileName)) {
                 dirs.push({
-                    name: fileName
+                    name: fileName,
+                    path: [filePath, fileName + '.html'].join('/')
                 });
             }
         }
@@ -62,6 +63,49 @@ app.get('/api/component/:id', function(req, res) {
 app.put('/api/file', function (req, res) {
     var code = req.body.code;
     var filePath = req.body.filePath;
+    var filePathSplit = filePath.split('/');
+    var dir = filePathSplit.splice(0, filePathSplit.length-1).join('/');
+    console.log('Code:', code);
+    console.log('File path:', filePath);
+    jsonfile.readFile(COMPONENTS_JSON, function (err, obj) {
+        if (err) {
+            if(err.code === 'ENOENT') {
+                obj = {};
+            }
+            else {
+                console.error(err);
+                return;
+            }
+        }
+        if (obj && obj[filePath]) {
+            console.warn("Warning: element '" + filePath + "' already exists");
+        }
+        obj[filePath] = filePath;
+        jsonfile.writeFile(COMPONENTS_JSON, obj, function (err) {
+            if(err) {
+                console.error(err);
+            }
+        });
+        fs.ensureDir(dir, function(err) {
+            if(err) {
+                res.status(500).send({ error: err });
+                console.error(err);
+            }
+            else {
+                fs.writeFile(filePath, code, function () {
+                    res.send({
+                        filePath: filePath,
+                        status: 'OK'
+                    });
+                });
+            }
+        })
+    });
+});
+
+app.put('/api/component', function (req, res) {
+    var code = req.body.code;
+    var filePath = getMainFilePath(req.body.componentId);
     var filePathSplit = filePath.split('/');
     var dir = filePathSplit.splice(0, filePathSplit.length-1).join('/');
     console.log('Code:', code);
