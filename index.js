@@ -5,6 +5,7 @@ const jsonfile = require('jsonfile');
 
 const PORT = 3001;
 const COMPONENTS_ROOT = './components';
+const COMPONENTS_PATH = '/components';
 const COMPONENTS_JSON = [COMPONENTS_ROOT, 'components.json'].join('/');
 
 var app = express();
@@ -34,11 +35,12 @@ app.get('/api/components', function (req, res) {
     fs.readdir(COMPONENTS_ROOT, function (err, fileNames) {
         for (let i = 0; i < fileNames.length; i++) {
             let fileName = fileNames[i];
-            let filePath = [COMPONENTS_ROOT, fileName].join('/');
-            if (fs.lstatSync(filePath).isDirectory() && isComponent(fileName)) {
+            let localFilePath = [COMPONENTS_ROOT, fileName].join('/');
+            if (fs.lstatSync(localFilePath).isDirectory() && isComponent(fileName)) {
+                let remoteFilePath = [COMPONENTS_PATH, fileName, fileName + '.html'].join('/');
                 dirs.push({
                     name: fileName,
-                    path: [filePath, fileName + '.html'].join('/')
+                    path: remoteFilePath
                 });
             }
         }
@@ -151,18 +153,18 @@ app.put('/api/component', function (req, res) {
 });
 
 function getMainFilePath(id) {
-    var path = id.split('/');
     var dirPath = COMPONENTS_ROOT + '/' + id;
-    var dummyPath = dirPath + '/' + (path.length > 1 ? path[1] : id + '.html');
+    var urlPath = COMPONENTS_PATH + '/' + id;
     return new Promise(function (resolve, reject) {
         jsonfile.readFile(dirPath + '/bower.json', function (err, obj) {
             if (err || !obj || !obj.main) {
+                let dummyPath = COMPONENTS_ROOT + '/' + id + '/' + id + '.html';
                 console.error(err);
                 resolve(dummyPath);
             }
             else {
                 let relativePath = obj.main instanceof Array && obj.main.length ? obj.main[0] : obj.main;
-                resolve([ dirPath, relativePath ].join('/'));
+                resolve([ COMPONENTS_ROOT, id, relativePath ].join('/'));
             }
         });
     });

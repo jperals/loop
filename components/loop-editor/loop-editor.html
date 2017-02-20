@@ -111,9 +111,6 @@
             observers: [
                 '_onRouteChanged(componentIdData)'
             ],
-            ready: function () {
-                this._importAllComponents();
-            },
             _onRouteChanged: function (data) {
                 if (data.path && this.routeActionData) {
                     let path = data.path.replace(/^\/+/g, '');
@@ -199,28 +196,6 @@
             _getBasePath: function (uri) {
                 var splitUri = uri.split('/');
                 return splitUri.splice(0, splitUri.length - 1).join('/');
-            },
-            _importAllComponents: function () {
-                let headers = new Headers();
-                headers.append('Content-Type', 'application/json');
-                let opts = {
-                  headers: headers,
-                  method: "GET"
-                };
-                let that = this;
-                fetch(
-                  window.location.protocol + '//' + window.location.hostname + ':3001' + '/api/components',
-                  opts)
-                  .then(function (response) {
-                    return response.text();
-                  })
-                  .then(function (response) {
-                    let res = JSON.parse(response);
-                    let components = res.data.components;
-                    components.forEach(function(component) {
-                        Polymer.Base.importHref(component.path);
-                    });
-                })
             }
         });
     </script>

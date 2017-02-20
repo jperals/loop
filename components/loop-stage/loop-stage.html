@@ -13,8 +13,8 @@
         }
     </style>
     <template>
-        <div id="frame">
-        </div>
+        <iframe id="frame" src="../loop-frame/loop-frame.html">
+        </iframe>
     </template>
     <script>
         Polymer({
@@ -24,6 +24,9 @@
                 'clear': '_clear',
                 'file': '_updateFilePath',
                 'component': '_updateComponent'
+            },
+            ready: function () {
+                this.$.frame.onload = this._importAllComponents.bind(this);
             },
             _code: function (event) {
                 this._updateCode( event.detail );
@@ -42,12 +45,41 @@
                 this._addElement();
             },
             _addElement: function ( componentId ) {
+                let frameBody = this.$.frame.contentDocument.querySelector('body');
                 let el = document.createElement(componentId);
-                this.$.frame.appendChild(el);
+                frameBody.appendChild(el);
             },
             _updateComponent: function (event) {
-                this._updateCode('');
-                this._addElement( event.detail );
+                let frameBody = this.$.frame.contentDocument.querySelector('body');
+                frameBody.innerHTML = '';
+                this._addElement(event.detail);
+//                frameBody.addEventListener("DOMContentLoaded", function() {
+//                }.bind(this));
+            },
+            _importAllComponents: function () {
+                let headers = new Headers();
+                headers.append('Content-Type', 'application/json');
+                let opts = {
+                    headers: headers,
+                    method: "GET"
+                };
+                let head = this.$.frame.contentDocument.querySelector('head');
+                fetch(
+                        window.location.protocol + '//' + window.location.hostname + ':3001' + '/api/components',
+                        opts)
+                        .then(function (response) {
+                            return response.text();
+                        })
+                        .then(function (response) {
+                            let res = JSON.parse(response);
+                            let components = res.data.components;
+                            components.forEach(function(component) {
+                                var link = document.createElement('link');
+                                link.setAttribute('rel', 'import');
+                                link.setAttribute('href', component.path);
+                                head.appendChild(link);
+                            });
+                        })
             }
         })
     </script>
