@@ -1,11 +1,12 @@
+<script src="../webcomponentsjs/webcomponents-lite.js"></script>
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../app-route/app-location.html">
 <link rel="import" href="../app-route/app-route.html">
-<link rel="import" href="../editor-code/editor-code.html">
-<link rel="import" href="../editor-stage/editor-stage.html">
-<link rel="import" href="../component-palette/component-palette.html">
+<link rel="import" href="../loop-code/loop-code.html">
+<link rel="import" href="../loop-stage/loop-stage.html">
+<link rel="import" href="../loop-palette/loop-palette.html">
 
-<dom-module id="looop-editor">
+<dom-module id="loop-editor">
     <style>
         :host {
             height: 100%;
@@ -45,7 +46,7 @@
         #stage {
             top: 50%;
         }
-      	#component-palette {
+      	#palette {
             border-left: 1px solid lightgray;
             width: 140px;
       	}
@@ -69,15 +70,15 @@
         </div>
         <div id="main">
             <div id="editor">
-                <editor-code id="code"></editor-code>
-                <editor-stage id="stage"></editor-stage>
+                <loop-code id="code"></loop-code>
+                <loop-stage id="stage"></loop-stage>
             </div>
-	        <component-palette id="component-palette"></component-palette>
+	        <loop-palette id="palette"></loop-palette>
         </div>
     </template>
     <script>
         Polymer({
-            is: 'looop-editor',
+            is: 'loop-editor',
             properties: {
                 componentId: {
                     type: String

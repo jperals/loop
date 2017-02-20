@@ -1,7 +1,7 @@
 <script src="../webcomponentsjs/webcomponents-lite.js"></script>
 <link rel="import" href="../polymer/polymer.html">
 
-<dom-module id="editor-code">
+<dom-module id="loop-code">
     <style>
         :host {
             display: block;
@@ -29,7 +29,7 @@
     <script src="bower_components/codemirror/addon/fold/comment-fold.js"></script>
     <script>
         Polymer({
-            is: 'editor-code',
+            is: 'loop-code',
             listeners: {
                 'code': 'updateCode',
                 'clear': '_clear'
