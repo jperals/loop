@@ -1,15 +1,10 @@
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="loop-component.html">
 
 <dom-module id="loop-palette">
-  <style>
-      .component {
-          padding: 10px;
-          border-bottom: 1px solid lightgray;
-      }
-  </style>
   <template>
     <template is="dom-repeat" items="{{components}}">
-      <div class="component"><a href="#/load/{{ item.name }}">{{ item.name }}</a></div>
+      <loop-component component-id="{{ item.name }}"></loop-component>
     </template>
   </template>
   <script>

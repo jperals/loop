@@ -1,0 +1,23 @@
+<dom-module id="loop-component">
+    <style>
+        :host {
+            display: block;
+            padding: 10px;
+            border-bottom: 1px solid lightgray;
+        }
+    </style>
+    <template>
+        <a href="#/load/{{ componentId }}">{{ componentId }}</a>
+    </template>
+    <script>
+        Polymer({
+            is: 'loop-component',
+            properties: {
+                componentId: {
+                    type: String,
+                    value: ''
+                }
+            }
+        });
+    </script>
+</dom-module>
