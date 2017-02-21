@@ -1,13 +1,17 @@
 <dom-module id="loop-component">
     <style>
-        :host {
+        #anchor {
             display: block;
             padding: 10px;
             border-bottom: 1px solid lightgray;
         }
+        #puppet {
+            position: fixed;
+        }
     </style>
     <template>
-        <a href="#/load/{{ componentId }}">{{ componentId }}</a>
+        <a id="anchor" href="#/load/{{ componentId }}">{{ componentId }}</a>
+        <div id="puppet" style$="top: {{ puppetTop }}px; left: {{ puppetLeft }}px"></div>
     </template>
     <script>
         Polymer({
@@ -16,7 +20,31 @@
                 componentId: {
                     type: String,
                     value: ''
-                }
+                },
+                puppetTop: Number,
+                puppetLeft: Number
+            },
+            ready: function () {
+                var el = this.$.anchor;
+                el.addEventListener('mousedown', this._startTracking.bind(this));
+                el.addEventListener('mouseup', this._release.bind(this));
+            },
+            _startTracking: function (event) {
+                let firstTime = true;
+                var puppet;
+                document.addEventListener('mousemove', function(event) {
+                    if(firstTime) {
+                        firstTime = false;
+                        puppet = document.createElement(this.componentId);
+                        this.$.puppet.appendChild(puppet);
+                    }
+                    this.puppetLeft = event.clientX;
+                    this.puppetTop = event.clientY;
+                }.bind(this));
+            },
+            _release: function (event) {
+                this.$.puppet.innerHTML = '';
+                // Fire event
             }
         });
     </script>
