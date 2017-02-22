@@ -92,20 +92,27 @@
                 },
                 routeActionData: {
                     type: Object
+                },
+                tracking: {
+                    type: Boolean,
+                    value: false
                 }
             },
             listeners: {
                 'load-button.tap': '_loadAction',
                 'save-button.tap': '_saveAction',
                 'new-button.tap': '_newAction',
-                'update-button.tap': '_updateAction',
-                'start-dragging': '_startDragging',
-                'drag-link': '_drag',
-                'stop-dragging-link': '_stopDragging'
+                'update-button.tap': '_updateAction'
             },
             observers: [
                 '_onRouteChanged(componentIdData)'
             ],
+            ready: function () {
+                var el = this.$.main;
+                el.addEventListener('dragstart', this._startDragging.bind(this));
+                el.addEventListener('drag', this._drag.bind(this));
+                el.addEventListener('dragend', this._stopDragging.bind(this));
+            },
             _onRouteChanged: function (data) {
                 if (data.path && this.routeActionData) {
                     let path = data.path.replace(/^\/+/g, '');
@@ -193,14 +200,31 @@
                 return splitUri.splice(0, splitUri.length - 1).join('/');
             },
             _startDragging: function (event) {
-                this.$['stage'].fire('start-dragging', event.detail);
+                var componentId = event.target && event.target.getAttribute('component-id');
+                if (componentId && !this.tracking) {
+                    this.tracking = true;
+                    console.log('trigger start-dragging');
+                    this.$.stage.fire('drag-component', {
+                        componentId: componentId,
+                        x: event.clientX,
+                        y: event.clientY
+                    });
+                }
             },
             _drag: function (event) {
-                console.log('drag from loop-editor');
-                this.$['stage'].fire('drag', event.detail);
+                if(this.tracking) {
+                    this.$.stage.fire('drag-component', {
+                        x: event.clientX,
+                        y: event.clientY
+                    });
+                }
             },
             _stopDragging: function (event) {
-                this.$['stage'].fire('stop-dragging', event.detail);
+                if(this.tracking)   {
+                    console.log('stop tracking from loop-editor');
+                    this.$.stage.fire('stop-dragging');
+                    this.tracking = false;
+                }
             }
         });
     </script>

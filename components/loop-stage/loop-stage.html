@@ -25,7 +25,7 @@
                 'file': '_updateFilePath',
                 'component': '_updateComponent',
                 'start-dragging': '_startDragging',
-                'drag': '_drag',
+                'drag-component': '_drag',
                 'stop-dragging': '_stopDragging'
             },
             ready: function () {
@@ -94,7 +94,7 @@
                     this.puppet.style.position = 'absolute';
                     frameBody.appendChild(this.puppet);
                 }
-//                console.log(event.detail);
+                console.log(event.detail);
                 this.puppet.style.left = event.detail.x + 'px';
                 this.puppet.style.top = event.detail.y + 'px';
             },

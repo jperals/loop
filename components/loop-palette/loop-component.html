@@ -5,13 +5,9 @@
             padding: 10px;
             border-bottom: 1px solid lightgray;
         }
-
-        #puppet {
-            position: fixed;
-        }
     </style>
     <template>
-        <a id="anchor" href="#/load/{{ componentId }}">{{ componentId }}</a>
+        <a id="anchor" component-id$="{{componentId}}" href="#/load/{{ componentId }}">{{ componentId }}</a>
     </template>
     <script>
         Polymer({
@@ -19,43 +15,9 @@
             properties: {
                 componentId: {
                     type: String,
-                    value: ''
-                },
-                tracking: {
-                    type: Boolean,
-                    value: false
+                    value: '',
+                    notify: true
                 }
-            },
-            ready: function () {
-                var el = this.$.anchor;
-                el.addEventListener('mousedown', this._startTracking.bind(this));
-                el.addEventListener('mousemove', this._track.bind(this));
-                el.addEventListener('mouseup', this._release.bind(this));
-            },
-            _startTracking: function (event) {
-                if (!this.tracking) {
-                    this.tracking = true;
-                    console.log('trigger start-dragging');
-                    this.fire('drag-link', {
-                        componentId: this.componentId,
-                        x: event.clientX,
-                        y: event.clientY
-                    });
-                }
-            },
-            _track: function (event) {
-                event.preventDefault();
-                if(this.tracking) {
-                    this.fire('drag-link', {
-                        x: event.clientX,
-                        y: event.clientY
-                    });
-                }
-            },
-            _release: function (event) {
-                this.fire('stop-dragging-link');
-                this.tracking = false;
-                // Fire event
             }
         });
     </script>
