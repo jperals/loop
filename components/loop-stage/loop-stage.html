@@ -23,7 +23,10 @@
                 'code': '_code',
                 'clear': '_clear',
                 'file': '_updateFilePath',
-                'component': '_updateComponent'
+                'component': '_updateComponent',
+                'start-dragging': '_startDragging',
+                'drag': '_drag',
+                'stop-dragging': '_stopDragging'
             },
             ready: function () {
                 this.$.frame.onload = this._importAllComponents.bind(this);
@@ -80,6 +83,23 @@
                                 head.appendChild(link);
                             });
                         })
+            },
+            _startDragging: function(event) {
+                console.log(event.detail);
+            },
+            _drag: function(event) {
+                if(event.detail.componentId) {
+                    this.puppet = document.createElement(event.detail.componentId);
+                    let frameBody = this.$.frame.contentDocument.querySelector('body');
+                    this.puppet.style.position = 'absolute';
+                    frameBody.appendChild(this.puppet);
+                }
+//                console.log(event.detail);
+                this.puppet.style.left = event.detail.x + 'px';
+                this.puppet.style.top = event.detail.y + 'px';
+            },
+            _stopDragging: function(event) {
+                console.log(event.detail);
             }
         })
     </script>

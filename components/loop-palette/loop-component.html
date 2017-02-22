@@ -5,13 +5,13 @@
             padding: 10px;
             border-bottom: 1px solid lightgray;
         }
+
         #puppet {
             position: fixed;
         }
     </style>
     <template>
         <a id="anchor" href="#/load/{{ componentId }}">{{ componentId }}</a>
-        <div id="puppet" style$="top: {{ puppetTop }}px; left: {{ puppetLeft }}px"></div>
     </template>
     <script>
         Polymer({
@@ -21,29 +21,40 @@
                     type: String,
                     value: ''
                 },
-                puppetTop: Number,
-                puppetLeft: Number
+                tracking: {
+                    type: Boolean,
+                    value: false
+                }
             },
             ready: function () {
                 var el = this.$.anchor;
                 el.addEventListener('mousedown', this._startTracking.bind(this));
+                el.addEventListener('mousemove', this._track.bind(this));
                 el.addEventListener('mouseup', this._release.bind(this));
             },
             _startTracking: function (event) {
-                let firstTime = true;
-                var puppet;
-                document.addEventListener('mousemove', function(event) {
-                    if(firstTime) {
-                        firstTime = false;
-                        puppet = document.createElement(this.componentId);
-                        this.$.puppet.appendChild(puppet);
-                    }
-                    this.puppetLeft = event.clientX;
-                    this.puppetTop = event.clientY;
-                }.bind(this));
+                if (!this.tracking) {
+                    this.tracking = true;
+                    console.log('trigger start-dragging');
+                    this.fire('drag-link', {
+                        componentId: this.componentId,
+                        x: event.clientX,
+                        y: event.clientY
+                    });
+                }
+            },
+            _track: function (event) {
+                event.preventDefault();
+                if(this.tracking) {
+                    this.fire('drag-link', {
+                        x: event.clientX,
+                        y: event.clientY
+                    });
+                }
             },
             _release: function (event) {
-                this.$.puppet.innerHTML = '';
+                this.fire('stop-dragging-link');
+                this.tracking = false;
                 // Fire event
             }
         });

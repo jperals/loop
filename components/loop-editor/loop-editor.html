@@ -98,7 +98,10 @@
                 'load-button.tap': '_loadAction',
                 'save-button.tap': '_saveAction',
                 'new-button.tap': '_newAction',
-                'update-button.tap': '_updateAction'
+                'update-button.tap': '_updateAction',
+                'start-dragging': '_startDragging',
+                'drag-link': '_drag',
+                'stop-dragging-link': '_stopDragging'
             },
             observers: [
                 '_onRouteChanged(componentIdData)'
@@ -188,6 +191,16 @@
             _getBasePath: function (uri) {
                 var splitUri = uri.split('/');
                 return splitUri.splice(0, splitUri.length - 1).join('/');
+            },
+            _startDragging: function (event) {
+                this.$['stage'].fire('start-dragging', event.detail);
+            },
+            _drag: function (event) {
+                console.log('drag from loop-editor');
+                this.$['stage'].fire('drag', event.detail);
+            },
+            _stopDragging: function (event) {
+                this.$['stage'].fire('stop-dragging', event.detail);
             }
         });
     </script>
