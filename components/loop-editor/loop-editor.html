@@ -203,7 +203,6 @@
                 var componentId = event.target && event.target.getAttribute('component-id');
                 if (componentId && !this.tracking) {
                     this.tracking = true;
-                    console.log('trigger start-dragging');
                     this.$.stage.fire('drag-component', {
                         componentId: componentId,
                         x: event.clientX,
@@ -212,7 +211,9 @@
                 }
             },
             _drag: function (event) {
-                if(this.tracking) {
+                // There seems to be a Chrome bug, where the coordinates of the last drag event
+                // are always 0,0 or 0,-30. So work around this:
+                if(this.tracking && event.clientX != 0) {
                     this.$.stage.fire('drag-component', {
                         x: event.clientX,
                         y: event.clientY
@@ -221,7 +222,11 @@
             },
             _stopDragging: function (event) {
                 if(this.tracking)   {
-                    console.log('stop tracking from loop-editor');
+                    // For some reason the coordinates of the dragend event are different
+                    // from those of the drag event. Probably a Chrome bug.
+                    // So just don't send the coordinates and use the ones from the last sensible
+                    // drag event as the final coordinates.
+                    // So actually fire this event here is rather useless right now.
                     this.$.stage.fire('stop-dragging');
                     this.tracking = false;
                 }

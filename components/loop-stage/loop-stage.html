@@ -94,12 +94,14 @@
                     this.puppet.style.position = 'absolute';
                     frameBody.appendChild(this.puppet);
                 }
-                console.log(event.detail);
                 this.puppet.style.left = event.detail.x + 'px';
                 this.puppet.style.top = event.detail.y + 'px';
             },
             _stopDragging: function(event) {
-                console.log(event.detail);
+                if(event.detail.x && event.detail.y) {
+                    this.puppet.style.left = event.detail.x + 'px';
+                    this.puppet.style.top = event.detail.y + 'px';
+                }
             }
         })
     </script>
