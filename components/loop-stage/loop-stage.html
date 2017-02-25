@@ -77,10 +77,21 @@
                             let res = JSON.parse(response);
                             let components = res.data.components;
                             components.forEach(function(component) {
-                                var link = document.createElement('link');
-                                link.setAttribute('rel', 'import');
-                                link.setAttribute('href', component.path);
-                                head.appendChild(link);
+                                var link;
+                                let pathSplit = component.path.split('.');
+                                let extension = pathSplit[pathSplit.length - 1];
+                                switch(extension) {
+                                    case 'html':
+                                        link = document.createElement('link');
+                                        link.setAttribute('rel', 'import');
+                                        link.setAttribute('href', component.path);
+                                        head.appendChild(link);
+                                        break;
+                                    case 'js':
+                                        link = document.createElement('script');
+                                        link.setAttribute('src', component.path);
+                                        head.appendChild(link);
+                                }
                             });
                         })
             },
