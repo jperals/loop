@@ -31,31 +31,46 @@ app.listen(PORT, function () {
 });
 
 app.get('/api/components', function (req, res) {
-    var dirs = [];
+    var promises = [];
     fs.readdir(COMPONENTS_ROOT, function (err, fileNames) {
         for (let i = 0; i < fileNames.length; i++) {
             let fileName = fileNames[i];
-            let localFilePath = [COMPONENTS_ROOT, fileName].join('/');
-            if (fs.lstatSync(localFilePath).isDirectory() && isComponent(fileName)) {
-                let remoteFilePath = [COMPONENTS_PATH, fileName, fileName + '.html'].join('/');
-                dirs.push({
-                    name: fileName,
-                    path: remoteFilePath
-                });
-            }
+            promises.push(new Promise(function(resolve, reject) {
+                getMainFilePath(fileName)
+                    .then(function(path) {
+                        resolve({
+                            name: fileName,
+                            path: COMPONENTS_PATH + '/' + path
+                        });
+                    })
+                    .catch(function(reason) {
+                        console.warn("Warning: couldn't get component main file path. " + reason);
+                        resolve();
+                    });
+            }));
         }
-        res.json({
-            data: {
-                components: dirs
-            }
-        })
+        Promise.all(promises)
+            .then(function(dirs) {
+                var dirs2 = [];
+                dirs.forEach(function(dir) {
+                    if(dir != undefined) {
+                        dirs2.push(dir);
+                    }
+                });
+                res.json({
+                    data: {
+                        components: dirs2
+                    }
+                })
+            });
+
     });
 });
 
 app.get('/api/component/:id', function (req, res) {
     getMainFilePath(req.params.id)
         .then(function (mainFile) {
-            fs.readFile(mainFile, function (err, data) {
+            fs.readFile([ COMPONENTS_ROOT, mainFile ].join('/'), function (err, data) {
                 if (err) {
                     console.error(err);
                 }
@@ -112,7 +127,7 @@ app.put('/api/component', function (req, res) {
     getMainFilePath(req.body.componentId)
         .then(function (filePath) {
             var filePathSplit = filePath.split('/');
-            var dir = filePathSplit.splice(0, filePathSplit.length - 1).join('/');
+            var dir = COMPONENTS_ROOT + '/' + filePathSplit.splice(0, filePathSplit.length - 1).join('/');
             console.log('Code:', code);
             console.log('File path:', filePath);
             jsonfile.readFile(COMPONENTS_JSON, function (err, obj) {
@@ -158,13 +173,27 @@ function getMainFilePath(id) {
     return new Promise(function (resolve, reject) {
         jsonfile.readFile(dirPath + '/bower.json', function (err, obj) {
             if (err || !obj || !obj.main) {
-                let dummyPath = COMPONENTS_ROOT + '/' + id + '/' + id + '.html';
+                let dummyPath = id + '/' + id + '.html';
                 console.error(err);
-                resolve(dummyPath);
+                fs.exists(COMPONENTS_ROOT + '/' + dummyPath, function(exists) {
+                   if(exists) {
+                       resolve(dummyPath);
+                   }
+                    else {
+                       fs.exists(COMPONENTS_ROOT + '/index.html', function(exists) {
+                           if(exists) {
+                               resolve(dummyPath);
+                           }
+                           else {
+                               reject("Couldn't guess main file for component " + id);
+                           }
+                       });
+                   }
+                });
             }
             else {
                 let relativePath = obj.main instanceof Array && obj.main.length ? obj.main[0] : obj.main;
-                resolve([ COMPONENTS_ROOT, id, relativePath ].join('/'));
+                resolve([ id, relativePath ].join('/'));
             }
         });
     });
