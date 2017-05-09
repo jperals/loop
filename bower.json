@@ -1,7 +1,7 @@
 {
-  "name": "looop-editor",
+  "name": "loop-editor",
   "description": "Web components editor",
-  "main": "looop-editor.html",
+  "main": "loop-editor.html",
   "dependencies": {
     "polymer": "Polymer/polymer#^1.4.0"
   },
